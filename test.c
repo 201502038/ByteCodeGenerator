@@ -7,7 +7,7 @@ void minus(int a, int b) {
 }
 
 void main () {
-	int x = 3;
+	int x = 10;
 	int y = 1;
 	_print(sum(x, y));
 	_print(minus(x, y));
