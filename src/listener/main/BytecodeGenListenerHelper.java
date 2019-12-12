@@ -71,14 +71,15 @@ public class BytecodeGenListenerHelper {
 	
 	// <information extraction>
 	static String getStackSize(Fun_declContext ctx) {
+		
 		return "32";
 	}
-	static String getLocalVarSize(Fun_declContext ctx) {
-		return "32";
+	static String getLocalVarSize(SymbolTable table) {
+		return String.valueOf(table.getLocalSize() * 4);
 	}
+
 	static String getTypeText(Type_specContext typespec) {
 		return typespec.getText();
-			// <Fill in> 애매
 	}
 
 	// params

@@ -40,6 +40,7 @@ public class SymbolTable {
 		public String sigStr;
 	}
 	
+	
 	private Map<String, VarInfo> _lsymtable = new HashMap<>();	// local v.
 	private Map<String, VarInfo> _gsymtable = new HashMap<>();	// global v.
 	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function 
@@ -53,6 +54,9 @@ public class SymbolTable {
 	SymbolTable(){
 		initFunDecl();
 		initFunTable();
+	}
+	int getLocalSize() {
+		return this._lsymtable.size();
 	}
 	
 	void initFunDecl(){		// at each func decl

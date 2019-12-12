@@ -183,7 +183,7 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 
 	private String funcHeader(MiniCParser.Fun_declContext ctx, String fname) {
 		return ".method public static " + symbolTable.getFunSpecStr(fname) + "\n" + ".limit stack "
-				+ getStackSize(ctx) + "\n" + ".limit locals " + getLocalVarSize(ctx) + "\n";
+				+ getStackSize(ctx) + "\n" + ".limit locals " + getLocalVarSize(symbolTable) + "\n";
 
 	}
 
