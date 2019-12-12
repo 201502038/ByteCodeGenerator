@@ -67,14 +67,8 @@ public class SymbolTable {
 	}
 	
 	void putLocalVar(String varname, Type type){
-		if(type.equals(Type.INT)) {
 			VarInfo localinfo = new VarInfo(type, _localVarID++);
 			_lsymtable.put(varname, localinfo);
-		}
-		else {
-			
-		}
-		
 	}
 	
 	void putGlobalVar(String varname, Type type){

@@ -25,10 +25,6 @@ public class BytecodeGenListenerHelper {
 		if(max_stack_size < current_stack_size) max_stack_size = current_stack_size;
 	}
 	
-	static void plus_max_size(int x) {
-		max_stack_size += x;
-	}
-	
 	static void plus_stack_size(String str) {
 		int length = str.length();
 		int i = 0;
@@ -102,11 +98,11 @@ public class BytecodeGenListenerHelper {
 	
 	// <information extraction>
 	static String getStackSize(Fun_declContext ctx) {
-		return String.valueOf(max_stack_size);
+		return String.valueOf(max_stack_size + 5);
 	}
 	
 	static String getLocalVarSize(SymbolTable table) {
-		return String.valueOf(table.getLocalSize() * 4);
+		return String.valueOf(table.getLocalSize());
 	}
 
 	static String getTypeText(Type_specContext typespec) {

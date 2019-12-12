@@ -96,10 +96,12 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 		String fun_decl = "", var_decl = "";
 
 		for (int i = 0; i < ctx.getChildCount(); i++) { // prgram : decl+ (decl있는 만큼 반복)
-			if (isFunDecl(ctx, i)) // decl -> fun_decl
-				fun_decl += newTexts.get(ctx.decl(i));
-			else // decl -> var_decl
-				var_decl += newTexts.get(ctx.decl(i));
+			if (ctx.decl(i).struct_decl() == null) {
+                if (isFunDecl(ctx, i))
+                    fun_decl += newTexts.get(ctx.decl(i));
+                else
+                    var_decl += newTexts.get(ctx.decl(i));
+            }
 		}
 
 		newTexts.put(ctx, classProlog + var_decl + fun_decl);
@@ -205,7 +207,6 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 			stmt += funcHeader(ctx, ctx.IDENT().getText()) + newTexts.get(ctx.compound_stmt()) + ".end method\n";
 			// stmt += 함수 헤더 + 함수 실행문 + .end method
 		}
-		reset_stack_size();
 		newTexts.put(ctx, stmt);
 	}
 
@@ -403,40 +404,32 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 			
 		// 참일경우 스택에 1이 쌓음, 거짓일 경우 스택에 0을 쌓음 
 		case "==":
-			plus_stack_size(-1);
 			expr += "isub " + "\n" + "ifeq l2" + "\n" + "ldc 0" + "\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1"
 					+ "\n" + lend + ": " + "\n";
 			break;
 		case "!=":
-			plus_stack_size(-1);
 			expr += "isub " + "\n" + "ifne l2" + "\n" + "ldc 0" + "\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1"
 					+ "\n" + lend + ": " + "\n";
 			break;
 		case "<=":
-			plus_stack_size(-1);
 			expr += "if_icmple "+ l2 + "\n" + "ldc 0\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1\n" + lend + ": \n"; 
 			break;
 		case "<":
-			plus_stack_size(-1);
 			expr += "if_icmplt "+ l2 + "\n" + "ldc 0\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1\n" + lend + ": \n";
 			break;
 
 		case ">=":
-			plus_stack_size(-1);
 			expr += "if_icmpge "+ l2 + "\n" + "ldc 0\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1\n" + lend + ": \n";
 			break;
 
 		case ">":
-			plus_stack_size(-1);
 			expr += "if_icmpgt "+ l2 + "\n" + "ldc 0\n" + "goto " + lend + "\n" + l2 + ": \n" + "ldc 1\n" + lend + ": \n";
 			break;
 
 		case "and":
-			plus_stack_size(-1);
 			expr += "ifne " + lend + "\n" + "pop" + "\n" + "ldc 0" + "\n" + lend + ": " + "\n";
 			break;
 		case "or":
-			plus_stack_size(-1);
 			expr += "ifeq " + lend + "\n" + "pop" + "\n" + "ldc 1" + "\n" + lend + ": " + "\n";
 			break;
 
@@ -449,7 +442,6 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 
 		if (fname.equals("_print")) { // System.out.println
 			plus_stack_size(1);
-			plus_stack_size(-1);
 			expr = "getstatic java/lang/System/out Ljava/io/PrintStream; " + "\n" + newTexts.get(ctx.args())
 					+ "invokevirtual " + symbolTable.getFunSpecStr("_print") + "\n";
 		} else {
