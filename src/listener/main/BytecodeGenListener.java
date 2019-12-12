@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream.PutField;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -29,7 +30,8 @@ import generated.MiniCParser.Var_declContext;
 public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeListener {
 	ParseTreeProperty<String> newTexts = new ParseTreeProperty<String>();
 	SymbolTable symbolTable = new SymbolTable();
-
+	 //추가된 코드
+    HashMap<String, Struct> map = new HashMap<>();
 	int tab = 0;
 	int label = 0;
 
@@ -73,7 +75,16 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 			symbolTable.putLocalVar(getLocalVarName(ctx), Type.INTARRAY);
 		} else if (isDeclWithInit(ctx)) {
 			symbolTable.putLocalVarWithInitVal(getLocalVarName(ctx), Type.INT, initVal(ctx));
-		} else { // simple decl
+		}else if (ctx.type_spec().STRUCT() != null) {
+            //추가된 코드
+            String s = ctx.type_spec().expr().IDENT().toString();
+            Struct temp = map.get(s);
+            String s_name = ctx.IDENT().toString();
+            for (int i = 0; i < temp.getCount(); i++) {
+                String[] field = temp.getField();
+                symbolTable.putLocalVar(s_name + "." + field[i], Type.STRUCT);
+            }
+        } else { // simple decl
 			symbolTable.putLocalVar(getLocalVarName(ctx), Type.INT);
 		}
 	}
@@ -118,7 +129,24 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 		}
 		newTexts.put(ctx, decl);
 	}
+	
+	@Override
+    public void enterStruct_decl(MiniCParser.Struct_declContext ctx) {
 
+    }
+
+    //추가된 코드
+    @Override
+    public void exitStruct_decl(MiniCParser.Struct_declContext ctx) {
+        int count = ctx.var_decl().size();
+        String[] strings = new String[count];
+        for (int i = 0; i < count; i++) {
+            strings[i] = ctx.var_decl(i).IDENT().toString();
+        }
+        String ident = ctx.IDENT().toString();
+        map.put(ident, new Struct(count, strings));
+    }
+	
 	// stmt : expr_stmt | compound_stmt | if_stmt | while_stmt | return_stmt
 	@Override
 	public void exitStmt(MiniCParser.StmtContext ctx) {
@@ -276,7 +304,7 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 		if (ctx.getChildCount() == 1) { // IDENT | LITERAL
 			if (ctx.IDENT() != null) {
 				String idName = ctx.IDENT().getText();
-				if (symbolTable.getVarType(idName) == Type.INT) {
+				if (symbolTable.getVarType(idName) == Type.INT || symbolTable.getVarType(idName) == Type.STRUCT) {
 					plus_stack_size(1);
 					expr += "iload " + symbolTable.getVarId(idName) + " \n";
 				}
