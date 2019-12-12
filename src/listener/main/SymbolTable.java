@@ -75,7 +75,6 @@ public class SymbolTable {
 			
 		}
 		
-		//<Fill here> 완료
 	}
 	
 	void putGlobalVar(String varname, Type type){
@@ -86,7 +85,6 @@ public class SymbolTable {
 		else {
 			
 		}
-		//<Fill here> 완료
 	}
 	
 	void putLocalVarWithInitVal(String varname, Type type, int initVar){
@@ -105,7 +103,6 @@ public class SymbolTable {
 		for(int i = 0; i < params.param().size(); i++) {
 			MiniCParser.ParamContext param = params.param(i);
 			putLocalVar(param.IDENT().getText(), Type.INT);
-		//<Fill here> 애매
 		}
 	}
 	
@@ -121,12 +118,10 @@ public class SymbolTable {
 	
 	public String getFunSpecStr(String fname) {		
 		return _fsymtable.get(fname).sigStr;
-		// <Fill here> 완료
 	}
 
 	public String getFunSpecStr(Fun_declContext ctx) {
 		return getFunSpecStr(ctx.IDENT().getText());
-		// <Fill here> 완료
 	}
 	
 	public String putFunSpecStr(Fun_declContext ctx) {
@@ -146,7 +141,6 @@ public class SymbolTable {
 			else
 				argtype += "I";
 		}
-		// <Fill here> 완료
 		
 		res =  fname + "(" + argtype + ")" + rtype;
 		
@@ -169,7 +163,6 @@ public class SymbolTable {
 		}
 		
 		return "";	
-		// <Fill here> 완료
 	}
 	
 	Type getVarType(String name){
@@ -197,7 +190,6 @@ public class SymbolTable {
 	// global
 	public String getVarId(Var_declContext ctx) {
 		return getVarId(ctx.IDENT().getText());
-		// <Fill here> 완료
 	}
 
 	// local

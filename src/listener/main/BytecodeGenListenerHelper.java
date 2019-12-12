@@ -16,8 +16,40 @@ import listener.main.SymbolTable.VarInfo;
 
 public class BytecodeGenListenerHelper {
 	
+	static private int current_stack_size;
+	static private int max_stack_size;
 	// <boolean functions>
 	
+	static void plus_stack_size(int x) {
+		current_stack_size += x;
+		if(max_stack_size < current_stack_size) max_stack_size = current_stack_size;
+	}
+	
+	static void plus_max_size(int x) {
+		max_stack_size += x;
+	}
+	
+	static void plus_stack_size(String str) {
+		int length = str.length();
+		int i = 0;
+		for(i=0; i < length; i++) {
+			if(str.charAt(i) == '(') break;
+		}
+		int start = i;
+		for(i = start; i < length; i++) {
+			if(str.charAt(i) == ')') break;
+		}
+		int end = i;
+		plus_stack_size(start - end + 1);
+		if(str.charAt(length-1) == 'I') plus_stack_size(1);
+	}
+	
+	
+	static void reset_stack_size() {
+		current_stack_size = 0;
+		max_stack_size = 0;
+	}
+		
 	static boolean isFunDecl(MiniCParser.ProgramContext ctx, int i) {
 		return ctx.getChild(i).getChild(0) instanceof MiniCParser.Fun_declContext;
 	}
@@ -57,7 +89,6 @@ public class BytecodeGenListenerHelper {
 	
 	static boolean isVoidF(Fun_declContext ctx) {
 		return ctx.getChildCount() == 4 ;
-			// <Fill in> 애매
 	}
 	
 	static boolean isIntReturn(MiniCParser.Return_stmtContext ctx) {
@@ -71,9 +102,9 @@ public class BytecodeGenListenerHelper {
 	
 	// <information extraction>
 	static String getStackSize(Fun_declContext ctx) {
-		
-		return "32";
+		return String.valueOf(max_stack_size);
 	}
+	
 	static String getLocalVarSize(SymbolTable table) {
 		return String.valueOf(table.getLocalSize() * 4);
 	}
@@ -85,7 +116,6 @@ public class BytecodeGenListenerHelper {
 	// params
 	static String getParamName(ParamContext param) {
 		return param.IDENT().getText();
-		// <Fill in> 완료
 	}
 	
 	static String getParamTypesText(ParamsContext params) {
@@ -100,21 +130,18 @@ public class BytecodeGenListenerHelper {
 	
 	static String getLocalVarName(Local_declContext local_decl) {
 		return local_decl.IDENT().getText();
-		// <Fill in> 완료
 	}
 	
 	static String getFunName(Fun_declContext ctx) {
 		return ctx.IDENT().getText();
-		// <Fill in> 완료
 	}
 	
 	static String getFunName(ExprContext ctx) {
 		return ctx.getChild(0).getText();
-		// <Fill in> 몰라
 	}
 	
 	static boolean noElse(If_stmtContext ctx) {
-		return ctx.getChildCount() < 5;
+		return ctx.getChildCount() == 5;
 	}
 	
 	static String getFunProlog() {
